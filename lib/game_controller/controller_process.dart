@@ -86,12 +86,13 @@ class GameInstruction {
       case WeaponShowActionGameEvent(:final weapon):
         debugPrint('WEAPON SHOW ACTION');
         // weapon.gameRef.camera.moveTo(weapon.position);
-        if (weapon.buttonShown) {
+        if (weapon.showed) {
           return;
         }
         controller.repository.setSelectedWeapon(null);
         controller.repository.setSelectedWeapon(weapon);
-        weapon.showMenu(controller.repository);
+        weapon.showMenu(
+            controller.repository, weapon.size, weapon.absolutePosition);
       default:
     }
   }
