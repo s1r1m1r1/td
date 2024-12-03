@@ -24,6 +24,7 @@ dependencies:
   # bonfire: ^3.6.2
   rxdart: ^0.28.0
   flutter_portal: ^1.1.4
+  logging: ^1.3.0
 
 dev_dependencies:
   flutter_test:

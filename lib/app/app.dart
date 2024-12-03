@@ -56,13 +56,8 @@ class _AppViewState extends State<_AppView> {
         child: GameWidget<GameMain>(
           game: GameMain(
             gameController: RepositoryProvider.of<GameController>(context),
-
-            // stageBarBloc: context.read<StageBarCubit>(),
-            // inventoryBloc: context.read<InventoryCubit>(),
           ),
           overlayBuilderMap: {
-            // WeaponMenuState.overlayName: (_, GameMain game) =>
-            //     WeaponMenuOverlay(cubit: game.weaponMenuCubit),
             'start': _pauseMenuBuilder,
           },
           initialActiveOverlays: const ['start'],
