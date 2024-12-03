@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:flame/components.dart';
 import 'package:flame/effects.dart';
 import 'package:flame/events.dart';
-import 'package:flame/input.dart';
 import 'package:flame/layout.dart';
 import 'package:flame/palette.dart';
 import 'package:flutter/material.dart';
@@ -14,67 +13,82 @@ import '../util/priority.dart';
 
 enum ButtonState { unpressed, pressed }
 
-mixin MixinWeaponButtons on PositionComponent {
+mixin MixinWeaponButtons on HasGameRef<GameMain> {
   PositionComponent? cancelButton;
   PositionComponent? destroyButton;
   PositionComponent? emptyButton;
   StreamSubscription? _subscription;
-  bool buttonShown = false;
+  bool showed = false;
 
-  void showMenu(GameRepository repository) {
-    if (buttonShown) {
+  void showMenu(
+      GameRepository repository, Vector2 parentSize, Vector2 globalPos) {
+    if (showed) {
       return;
     }
-
-    buttonShown = true;
+    showed = true;
     EffectController duration(double x) => EffectController(duration: x);
-    final half = size * 0.5;
-    final initMargin = EdgeInsets.only(bottom: half.y, right: half.x);
+    final paddingX = (parentSize.x - 50) / 2;
+    final paddingY = (parentSize.y - 50) / 2;
+    final startPos = Vector2(globalPos.x + paddingX, globalPos.y + paddingY);
 
     /// T0D0 add in other overlay
-    cancelButton = HudMarginComponent(margin: initMargin, children: [
-      CancelButtonComponent(
-        size: Vector2(50, 50),
-        priority: Priority.overlay,
-      ),
-    ]);
-    destroyButton = HudMarginComponent(margin: initMargin, children: [
-      DestroyButtonComponent(
-        size: Vector2(50, 50),
-        priority: Priority.overlay,
-      ),
-    ]);
-    emptyButton = HudMarginComponent(margin: initMargin, children: [
-      EmptyButtonComponent(
-        size: Vector2(50, 50),
-        priority: Priority.overlay,
-      ),
-    ]);
+    final cancelButton = CancelButtonComponent(
+      position: startPos,
+      size: Vector2(50, 50),
+      priority: Priority.overlay,
+      anchor: Anchor.topLeft,
+    );
+    final destroyButton = DestroyButtonComponent(
+      position: startPos,
+      size: Vector2(50, 50),
+      priority: Priority.overlay,
+      anchor: Anchor.topLeft,
+    );
+    final emptyButton = EmptyButtonComponent(
+      position: startPos,
+      size: Vector2(50, 50),
+      priority: Priority.overlay,
+      anchor: Anchor.topLeft,
+    );
+
     cancelButton
-      ?..add(
-        MoveEffect.to(Vector2(-half.x, -half.y - 5), duration(0.5)),
+      ..add(
+        MoveEffect.to(Vector2(startPos.x - 70, startPos.y - 60), duration(0.5)),
       )
       ..add(RotateEffect.to(-0.1, duration(0.3)));
-    emptyButton?.add(SequenceEffect([
-      MoveEffect.to(Vector2(half.x, -half.y - 10), duration(0.5)),
+    emptyButton.add(SequenceEffect([
+      MoveEffect.to(Vector2(startPos.x, startPos.y - 70), duration(0.5)),
     ]));
     destroyButton
-      ?..add(
-        MoveEffect.to(Vector2(half.x * 3, -half.y - 5), duration(0.5)),
+      ..add(
+        MoveEffect.to(Vector2(startPos.x + 70, startPos.y - 65), duration(0.5)),
       )
       ..add(RotateEffect.to(0.1, duration(0.3)));
-    add(cancelButton!);
-    add(emptyButton!);
-    add(destroyButton!);
+
+    gameRef.add(cancelButton);
+    gameRef.add(emptyButton);
+    gameRef.add(destroyButton);
 
     _subscription?.cancel();
     _subscription = repository.selectedWeaponSubject.stream.listen((selected) {
       if (selected == null) {
-        debugPrint('Remove from parent');
-        destroyButton?.removeFromParent();
-        cancelButton?.removeFromParent();
-        emptyButton?.removeFromParent();
-        buttonShown = false;
+        showed = false;
+        destroyButton
+          ..add(MoveEffect.to(startPos, duration(0.3)))
+          ..add(RotateEffect.to(0.0, duration(0.3)))
+          ..add(ScaleEffect.to(Vector2.all(0.8), duration(0.2)))
+          ..add(RemoveEffect(delay: 0.5));
+
+        cancelButton
+          ..add(MoveEffect.to(startPos, duration(0.3)))
+          ..add(ScaleEffect.to(Vector2.all(0.8), duration(0.2)))
+          ..add(RemoveEffect(delay: 0.5));
+
+        emptyButton
+          ..add(MoveEffect.to(startPos, duration(0.3)))
+          ..add(RotateEffect.to(0.0, duration(0.3)))
+          ..add(ScaleEffect.to(Vector2.all(0.8), duration(0.2)))
+          ..add(RemoveEffect(delay: 0.5));
       }
     });
   }
@@ -88,14 +102,14 @@ mixin MixinWeaponButtons on PositionComponent {
 
 class DestroyButtonComponent extends SpriteGroupComponent<ButtonState>
     with HasGameRef<GameMain>, TapCallbacks {
-  DestroyButtonComponent({super.size, super.priority})
-      : super(anchor: Anchor.center);
+  DestroyButtonComponent(
+      {super.size, super.position, super.priority, super.anchor});
 
   @override
   Future<void> onLoad() async {
     final pressedSprite = await game.loadSprite(
       'buttons.png',
-      srcPosition: Vector2(0, 20),
+      srcPosition: Vector2(0, 0),
       srcSize: Vector2(60, 20),
     );
     final unpressedSprite = await game.loadSprite(
@@ -142,8 +156,8 @@ class DestroyButtonComponent extends SpriteGroupComponent<ButtonState>
 
 class CancelButtonComponent extends SpriteGroupComponent<ButtonState>
     with HasGameRef<GameMain>, TapCallbacks {
-  CancelButtonComponent({super.size, super.priority})
-      : super(anchor: Anchor.center);
+  CancelButtonComponent(
+      {super.size, super.position, super.priority, super.anchor});
 
   @override
   Future<void> onLoad() async {
@@ -196,8 +210,8 @@ class CancelButtonComponent extends SpriteGroupComponent<ButtonState>
 
 class EmptyButtonComponent extends SpriteGroupComponent<ButtonState>
     with HasGameRef<GameMain>, TapCallbacks {
-  EmptyButtonComponent({super.size, super.priority})
-      : super(anchor: Anchor.center);
+  EmptyButtonComponent(
+      {super.size, super.position, super.priority, super.anchor});
 
   @override
   Future<void> onLoad() async {
