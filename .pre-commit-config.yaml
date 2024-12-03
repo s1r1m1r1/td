@@ -1,7 +1,0 @@
-repos:
-- repo: local
-  hooks:
-    - id: flutter-clean
-      name: clean
-      entry: bash _clean.sh
-      language: system
