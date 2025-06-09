@@ -49,12 +49,11 @@ class GameSetting {
     return dotMultiple(mapTileSize, scale);
   }
 
-  void setMapConstrainst({
-    required Vector2 screenSize,
-  }) {
+  void setMapConstrainst({required Vector2 screenSize}) {
     _screenSize = screenSize;
   }
 
+  @Deprecated('Migrate to fixed size ')
   void setScreenSize(Vector2 size) {
     _screenSize = size;
     optimizeMapGrid(size);
@@ -64,7 +63,8 @@ class GameSetting {
     enemyTarget = mapSize - (mapTileSize / 2);
 
     debugPrint(
-        '_screenSize $_screenSize,  mapGrid $mapGrid, mapTileSize $mapTileSize');
+      '_screenSize $_screenSize,  mapGrid $mapGrid, mapTileSize $mapTileSize',
+    );
   }
 
   void optimizeMapGrid(Vector2 size) {
@@ -77,8 +77,10 @@ class GameSetting {
     mapPosition = Vector2(size.x / 2, size.y / 2);
     mapSize = Vector2(size.x - 2, size.y - 2);
     mapGrid = mapSize / grid;
-    mapGrid =
-        Vector2(mapGrid.x.toInt().toDouble(), mapGrid.y.toInt().toDouble());
+    mapGrid = Vector2(
+      mapGrid.x.toInt().toDouble(),
+      mapGrid.y.toInt().toDouble(),
+    );
     mapTileSize = dotDivide(mapSize, mapGrid);
   }
 
@@ -117,8 +119,12 @@ class WeaponSetting {
 
   WeaponSetting.empty();
 
-  Future<void> fill(WeaponSettings dto, double tileSize, Sprite weaponTower,
-      Images images) async {
+  Future<void> fill(
+    WeaponSettings dto,
+    double tileSize,
+    Sprite weaponTower,
+    Images images,
+  ) async {
     label = dto.type.name;
     cost = dto.cost;
     range = dto.range * tileSize;
@@ -127,17 +133,19 @@ class WeaponSetting {
     rotateSpeed = pi * dto.rotateSpeed;
     bulletSpeed = tileSize * dto.bulletSpeed;
     size = gameSetting.scaleOnMapTile(Vector2(dto.sizeX, dto.sizeY));
-    bulletSize =
-        gameSetting.scaleOnMapTile(Vector2(dto.bulletSizeX, dto.bulletSizeY));
-    explosionSize = gameSetting
-        .scaleOnMapTile(Vector2(dto.explosionSizeX, dto.explosionSizeY));
+    bulletSize = gameSetting.scaleOnMapTile(
+      Vector2(dto.bulletSizeX, dto.bulletSizeY),
+    );
+    explosionSize = gameSetting.scaleOnMapTile(
+      Vector2(dto.explosionSizeX, dto.explosionSizeY),
+    );
     tower = weaponTower;
     barrel[0] = Sprite(await images.load('weapon/${dto.barrelImg0}.png'));
     barrel[1] = Sprite(await images.load('weapon/${dto.barrelImg1}.png'));
     barrel[2] = Sprite(await images.load('weapon/${dto.barrelImg2}.png'));
     bullet =
-        // Sprite(await images.load('weapon/${weaponParam['bulletImg']}.png'));
-        Sprite(await images.load('weapon/${dto.bulletImg}.png'));
+    // Sprite(await images.load('weapon/${weaponParam['bulletImg']}.png'));
+    Sprite(await images.load('weapon/${dto.bulletImg}.png'));
   }
 }
 
@@ -186,41 +194,49 @@ class EnemySettingV1 {
   final images = Images();
 
   Future<void> load() async {
-    enemy.add(EnemySetting()
-      ..life = 80
-      ..speed = 50
-      ..scale = 0.8
-      ..spriteSheet = SpriteSheet.fromColumnsAndRows(
-        image: await images.load('enemy/enemyA.png'),
-        columns: 2,
-        rows: 3,
-      ));
-    enemy.add(EnemySetting()
-      ..life = 150
-      ..speed = 60
-      ..scale = 1.0
-      ..spriteSheet = SpriteSheet.fromColumnsAndRows(
-        image: await images.load('enemy/enemyB.png'),
-        columns: 2,
-        rows: 3,
-      ));
-    enemy.add(EnemySetting()
-      ..life = 80
-      ..speed = 100
-      ..scale = 1.1
-      ..spriteSheet = SpriteSheet.fromColumnsAndRows(
-        image: await images.load('enemy/enemyC.png'),
-        columns: 2,
-        rows: 3,
-      ));
-    enemy.add(EnemySetting()
-      ..life = 300
-      ..speed = 40
-      ..scale = 1.5
-      ..spriteSheet = SpriteSheet.fromColumnsAndRows(
-        image: await images.load('enemy/enemyD.png'),
-        columns: 2,
-        rows: 3,
-      ));
+    enemy.add(
+      EnemySetting()
+        ..life = 80
+        ..speed = 50
+        ..scale = 0.8
+        ..spriteSheet = SpriteSheet.fromColumnsAndRows(
+          image: await images.load('enemy/enemyA.png'),
+          columns: 2,
+          rows: 3,
+        ),
+    );
+    enemy.add(
+      EnemySetting()
+        ..life = 150
+        ..speed = 60
+        ..scale = 1.0
+        ..spriteSheet = SpriteSheet.fromColumnsAndRows(
+          image: await images.load('enemy/enemyB.png'),
+          columns: 2,
+          rows: 3,
+        ),
+    );
+    enemy.add(
+      EnemySetting()
+        ..life = 80
+        ..speed = 100
+        ..scale = 1.1
+        ..spriteSheet = SpriteSheet.fromColumnsAndRows(
+          image: await images.load('enemy/enemyC.png'),
+          columns: 2,
+          rows: 3,
+        ),
+    );
+    enemy.add(
+      EnemySetting()
+        ..life = 300
+        ..speed = 40
+        ..scale = 1.5
+        ..spriteSheet = SpriteSheet.fromColumnsAndRows(
+          image: await images.load('enemy/enemyD.png'),
+          columns: 2,
+          rows: 3,
+        ),
+    );
   }
 }

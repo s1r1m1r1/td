@@ -1,8 +1,10 @@
 part of 'game_controller.dart';
 
+final _log = Logger(GameInstruction.loggerName)..level = Level.ALL;
 GameSetting gameSetting = GameSetting();
 
 class GameInstruction {
+  static const loggerName = 'GameInstruction';
   GameEvent event;
 
   GameInstruction(this.event);
@@ -16,19 +18,23 @@ class GameInstruction {
       case PausedGameEvent():
         controller.gameRef.pauseEngine();
       case WeaponBuildingGameEvent(:final component):
-        debugPrint('WEAPON BUILDING');
+        _log.info('WEAPON BUILDING');
         // hide
         controller.repository.setSelectedWeapon(null);
         // controller.gameRef.read<InventoryBloc>().add();
         final weapon = WeaponComponent.create(
-            component.position, controller.repository.weaponTypeNotifier.value);
+          component.position,
+          controller.repository.weaponTypeNotifier.value,
+        );
         controller.add(weapon);
         controller.buildingWeapon?.removeFromParent();
         controller.buildingWeapon = weapon;
-        weapon.blockMap = weapon.collision(controller.gateStart) ||
+        weapon.blockMap =
+            weapon.collision(controller.gateStart) ||
             weapon.collision(controller.gateEnd) ||
-            (await controller.gameRef.mapController
-                .isBlockPath(weapon.position));
+            (await controller.gameRef.mapController.isBlockPath(
+              weapon.position,
+            ));
       case WeaponSelectedGameEvent():
         debugPrint('WEAPON SELECTED');
         // hide
@@ -38,7 +44,8 @@ class GameInstruction {
         // controller.gameRef.weaponFactory.select(source as SingleWeaponView);
         if (controller.buildingWeapon != null) {
           controller.send(
-              GameEvent.weaponBuilding(component: controller.buildingWeapon!));
+            GameEvent.weaponBuilding(component: controller.buildingWeapon!),
+          );
         }
       case WeaponUnSelectedGameEvent():
         debugPrint('WEAPON UNSELECTED');
@@ -92,7 +99,10 @@ class GameInstruction {
         controller.repository.setSelectedWeapon(null);
         controller.repository.setSelectedWeapon(weapon);
         weapon.showMenu(
-            controller.repository, weapon.size, weapon.absolutePosition);
+          controller.repository,
+          weapon.size,
+          weapon.absolutePosition,
+        );
       default:
     }
   }

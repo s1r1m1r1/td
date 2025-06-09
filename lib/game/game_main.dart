@@ -18,9 +18,7 @@ class GameMain extends FlameGame with TapCallbacks {
 
   GameSetting setting = GameSetting();
 
-  GameMain({
-    required this.gameController,
-  });
+  GameMain({required this.gameController});
   StreamSubscription? _weaponMenuSubscription;
 
   @override
@@ -52,9 +50,7 @@ class GameMain extends FlameGame with TapCallbacks {
     add(mapController);
     add(gameController);
     if (kDebugMode) {
-      add(
-        FpsTextComponent(position: Vector2(0, size.y - 24)),
-      );
+      add(FpsTextComponent(position: Vector2(0, size.y - 24)));
     }
 
     setting.enemies.load();
