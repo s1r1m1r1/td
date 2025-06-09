@@ -5,6 +5,7 @@ import 'package:flame/cache.dart';
 import 'package:flame/components.dart';
 import 'package:flutter/foundation.dart';
 import 'package:get_it/get_it.dart';
+import 'package:logging/logging.dart';
 
 import '../game/base/radar.dart';
 import '../game/base/scanable.dart';
@@ -27,7 +28,7 @@ class GameController extends PositionComponent with HasGameRef<GameMain> {
   late final GameRepository repository;
   EnemyFactory enemyFactory = EnemyFactory();
   GameController()
-      : super(priority: Priority.controller, position: Vector2.zero()) {
+    : super(priority: Priority.controller, position: Vector2.zero()) {
     repository = GetIt.I.get<GameRepository>();
 
     add(enemyFactory);
@@ -61,9 +62,10 @@ class GameController extends PositionComponent with HasGameRef<GameMain> {
   /* Process Routine */
   void processRadarScan() {
     final radars = children.where((r) => r is Radar && r.radarOn).cast<Radar>();
-    final scanbles = children
-        .where((r) => r is Scanable && r.scanable)
-        .cast<PositionComponent>();
+    final scanbles =
+        children
+            .where((r) => r is Scanable && r.scanable)
+            .cast<PositionComponent>();
     for (final element in radars) {
       element.radarScan(scanbles);
     }
@@ -94,34 +96,42 @@ class GameController extends PositionComponent with HasGameRef<GameMain> {
     Vector2 start, end;
 
     if (rndx < rndy) {
-      start = Vector2(0,
-          (Random().nextDouble() * gameSetting.mapGrid.y).toInt().toDouble());
-      end = Vector2(gameSetting.mapGrid.x - 1,
-          (Random().nextDouble() * gameSetting.mapGrid.y).toInt().toDouble());
+      start = Vector2(
+        0,
+        (Random().nextDouble() * gameSetting.mapGrid.y).toInt().toDouble(),
+      );
+      end = Vector2(
+        gameSetting.mapGrid.x - 1,
+        (Random().nextDouble() * gameSetting.mapGrid.y).toInt().toDouble(),
+      );
     } else {
       start = Vector2(
-          (Random().nextDouble() * gameSetting.mapGrid.x).toInt().toDouble(),
-          0);
+        (Random().nextDouble() * gameSetting.mapGrid.x).toInt().toDouble(),
+        0,
+      );
       end = Vector2(
-          (Random().nextDouble() * gameSetting.mapGrid.x).toInt().toDouble(),
-          gameSetting.mapGrid.y - 1);
+        (Random().nextDouble() * gameSetting.mapGrid.x).toInt().toDouble(),
+        gameSetting.mapGrid.y - 1,
+      );
     }
-    start = gameSetting.dotMultiple(start, gameSetting.mapTileSize) +
+    start =
+        gameSetting.dotMultiple(start, gameSetting.mapTileSize) +
         (gameSetting.mapTileSize / 2);
-    end = gameSetting.dotMultiple(end, gameSetting.mapTileSize) +
+    end =
+        gameSetting.dotMultiple(end, gameSetting.mapTileSize) +
         (gameSetting.mapTileSize / 2);
 
     final images = Images();
     gateStart = NeutualComponent(
-        position: start,
-        size: gameSetting.mapTileSize,
-        neutualType: NeutualType.GATE_START)
-      ..sprite = Sprite(await images.load('blackhole.png'));
+      position: start,
+      size: gameSetting.mapTileSize,
+      neutualType: NeutualType.GATE_START,
+    )..sprite = Sprite(await images.load('blackhole.png'));
     gateEnd = NeutualComponent(
-        position: end,
-        size: gameSetting.mapTileSize,
-        neutualType: NeutualType.GATE_END)
-      ..sprite = Sprite(await images.load('whitehole.png'));
+      position: end,
+      size: gameSetting.mapTileSize,
+      neutualType: NeutualType.GATE_END,
+    )..sprite = Sprite(await images.load('whitehole.png'));
     add(gateStart);
     add(gateEnd);
   }
