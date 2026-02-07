@@ -1,15 +1,14 @@
 {
-    "recommendations": [
-        "Dart-Code.dart-code",
-        "Dart-Code.flutter",
-        "discretegames.f5anything",
-        "GitHub.copilot",
-        "gornivv.dart-generator-gorniv",
-        "gornivv.vscode-flutter-files",
-        "pflannery.vscode-versionlens",
-        "wilsonsio.color-vision",
-        "PKief.material-icon-theme",
-        "discretegames.f5anything",
-        "streetsidesoftware.code-spell-checker"
-    ]
+  "recommendations": [
+    "Dart-Code.dart-code",
+    "Dart-Code.flutter",
+    "discretegames.f5anything",
+    "GitHub.copilot",
+    "gornivv.dart-generator-gorniv",
+    "gornivv.vscode-flutter-files",
+    "legalfina.npm-version-lens",
+    "wilsonsio.color-vision",
+    "PKief.material-icon-theme",
+    "streetsidesoftware.code-spell-checker"
+  ]
 }
